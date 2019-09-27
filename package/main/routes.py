@@ -16,11 +16,14 @@ def home():
 
 @main.route('/search', methods=['GET', 'POST'])
 def search():
-    tags = request.form['query'].split(', ')
-    sets = []
+    try:
+        tags = request.form['query'].split(', ')
+    except:
+        tags = [request.args.get('tag', type=str)]
     searchform = SearchForm()
     page = request.args.get('page', 1, type=int)
-    for i in range(len(tags)):
+    sets = []
+    for tag in tags:
         post_ids = Tag.query.filter_by(name=tag).first().post_list
         id_set = set()
         for id in post_ids:
@@ -31,4 +34,4 @@ def search():
         sets.pop(1)
     sets = sets[0]
     posts = Post.query.filter(Post.id.in_(sets)).order_by(Post.date_posted.desc()).paginate(per_page=24, page=page)
-    return render_template('search.html', posts=posts, searchform=searchform, filter=tag)
+    return render_template('search.html', posts=posts, searchform=searchform, filter=', '.join(tags))
