@@ -5,17 +5,17 @@ navigate to directory
 
 $ python3 
 
->>> from package import create_app, db
+\>>> from package import create_app, db
 
->>> app = create_app()
+\>>> app = create_app()
 
->>> ctx = app.app_context()
+\>>> ctx = app.app_context()
 
->>> ctx.push()
+\>>> ctx.push()
 
->>> db.create_all()
+\>>> db.create_all()
 
->>> exit()
+\>>> exit()
 
 *To run:*
 
