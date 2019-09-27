@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+<form method="POST" action="">
+  {{ form.csrf_token }}
+  {{ form.email.label(class="form-control") }}
+  {{ form.email(class="form-control") }}
+  {% if form.email.errors %}
+    {% for error in form.email.errors %}
+        <p>{{ error }}</p>
+    {% endfor %}
+  {% endif %}
+  <br>
+  {{ form.submit(class="form-control") }}
+  <br>
+</form>
+{% endblock content %}

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+  {% for post in posts.items %}
+  <a href="{{ url_for('posts.post', post_id=post.id) }}">
+      <div class="post">
+          <img class="hp-image" src="{{ url_for('static', filename='post_images/' + post.picture) }}" style="width:215px;height:215px;">
+      </div>
+  </a>
+  {% endfor %}
+</div>
+<div class="container">
+  {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+    {% if page_num %}
+      {% if posts.page == page_num %}
+        <a href="{{ url_for('main.home', page=page_num) }}" style="font-weight: bold; text-decoration: underline;">{{ page_num }}</a>
+      {% else %}
+        <a href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
+      {% endif %}
+    {% else %}
+      ...
+    {% endif %}
+  {% endfor %}
+</div>
+{% endblock content %}

@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block content %}
+<form method="POST", action="{{ url_for('posts.confirm_delete', post_id=post.id) }}">
+  <p>Confirm deletion</p>
+  <input type="submit" style="color:red" value="Delete">
+</form>
+{% endblock content %}

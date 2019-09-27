@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+	<div class="container">
+		<img src="{{ url_for('static', filename='post_images/' + post.picture) }}"><br>
+		<a style="color: darkblue" href="{{ url_for('static', filename='post_images/' + post.picture) }}"><p>View original here</p></a>
+		{% if current_user.is_authenticated %}
+			{% if current_user.id == post.user_id or current_user.role > 0 %}
+				<a href="{{ url_for('posts.post_edit', post_id=post.id) }}" style="color:grey">Edit</a>
+				<a href="{{ url_for('posts.post_delete', post_id=post.id) }}" style="color:red">Delete</a>
+			{% endif %}
+		{% endif %}
+		<br>
+		<p>Tags: </p>
+		{% for tag in post.tag_list %}
+			<a href="{{ url_for('main.search', tag=tag.tag) }}">{{ tag.tag }}</a>
+		{% endfor %}
+		<br>
+		<p>Posted by <a style="color: darkblue;" href="{{ url_for('users.account', username=post.author.username) }}">{{ post.author.username }}</a></p>
+		<p>{{ post.date_posted.strftime('%d-%m-%Y %H:%M:%S GMT') }}</p><br>
+	</div>
+
+{% endblock %}

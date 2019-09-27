@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+  <form method="POST" action="">
+    {{ form.csrf_token }}
+    {{ form.email.label(class="form-control") }}
+    {{ form.email(class="form-control") }}
+    {% if form.email.errors %}
+        {% for error in form.email.errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    {% endif %}
+    <br>
+    {{ form.password.label(class="form-control") }}
+    {{ form.password(class="form-control") }}
+    {% if form.password.errors %}
+        {% for error in form.password.errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    {% endif %}
+    <br>
+    {{ form.submit(class="form-control") }}
+    <a href="{{ url_for('users.reset_request') }}">Forgot password</a>
+  </form>
+</div>
+{% endblock content %}

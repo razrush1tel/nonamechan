@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  {% if title %}
+    <title>nonamechan - {{ title }}</title>
+  {% else %}
+    <title>nonamechan</title>
+  {% endif %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" type="text/css">
+</head>
+<body>
+  <div class="header">
+    <a href="{{ url_for('main.home') }}">
+      <h1 class="title">nonamechan</h1>
+    </a>
+    <div class="navigation">
+      {% if current_user.is_authenticated %}
+        <form class="btn-form" action="{{ url_for('users.account', username=current_user.username) }}">
+          <input type="submit" value="Account">
+        </form>
+        {% else %}
+        <form class="btn-form" class="btn-form" action="{{ url_for('users.register') }}">
+          <input type="submit" value="Register">
+        </form>
+        <form class="btn-form" action="{{ url_for('users.login') }}">
+          <input type="submit" value="Log In">
+        </form>
+      {% endif %}
+    </div>
+    <div class="search-field">
+        <form class="btn-form" action="{{ url_for('posts.upload') }}">
+            <input type="submit" value="Upload">
+        </form>
+        <form method="POST" class="btn-form" action="{{ url_for('main.search', tag=searchform.query.data) }}">
+            {{ searchform.csrf_token }}
+            {{ searchform.query }}
+            {{ searchform.submit }}
+        </form>
+    </div>
+  </div>
+  {% block content %}{% endblock %}
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
