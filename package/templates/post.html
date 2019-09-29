@@ -17,6 +17,22 @@
 		<br>
 		<p>Posted by <a style="color: darkblue;" href="{{ url_for('users.account', username=post.author.username) }}">{{ post.author.username }}</a></p>
 		<p>{{ post.date_posted.strftime('%d-%m-%Y %H:%M:%S GMT') }}</p><br>
+		{% for comment in post.comment_list %}
+			<div class="comment">
+				<p>By <a style="color: darkblue;" href="{{ url_for('users.account', username=comment.author) }}">{{ comment.author }}</a> at {{ comment.date_posted.strftime('%d-%m-%Y %H:%M:%S GMT') }}</p>
+				<br>
+				<p>{{ comment.content }}</p>
+			</div>
+		{% endfor %}
+		{% if current_user.is_authenticated %}
+			<form method="POST" action="">
+				{{ commentform.csrf_token }}
+				{{ commentform.content }}
+				{{ commentform.submit }}
+			</form>
+		{% else %}
+			<p>You need to log in to write comments</p>
+		{% endif %}
 	</div>
 
 {% endblock %}
