@@ -2,18 +2,24 @@ import os
 from flask import Blueprint, flash, render_template, url_for, redirect, request, abort, current_app
 from flask_login import current_user, login_required
 from package import db
-from package.models import User, Post, Tag, Atable
-from package.posts.forms import SearchForm, UploadForm
+from package.models import User, Post, Tag, Atable, Comment
+from package.posts.forms import SearchForm, UploadForm, CommentForm
 from package.users.utils import save_picture
 
 posts = Blueprint('posts', __name__)
 
 
-@posts.route("/post/<int:post_id>")
+@posts.route("/post/<int:post_id>", methods=['GET', 'POST'])
 def post(post_id):
+    commentform = CommentForm()
     searchform = SearchForm()
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title='Post', post=post, searchform=searchform)
+    if commentform.validate_on_submit():
+        comment = Comment(author=current_user.username, content=commentform.content.data, post_id=post_id)
+        post.comment_list.append(comment)
+        db.session.commit()
+        return redirect(url_for('posts.post', post_id=post_id))
+    return render_template('post.html', title='Post', post=post, searchform=searchform, commentform=commentform)
 
 
 @login_required
