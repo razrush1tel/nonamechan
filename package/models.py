@@ -52,6 +52,7 @@ class Post(db.Model):
     picture_h = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     tag_list = db.relationship('Atable', back_populates='post')
+    comment_list = db.relationship('Comment', back_populates='under')
 
     def __repr__(self):
         return f"Post('{self.id}', '{self.date_posted}')"
@@ -64,3 +65,12 @@ class Tag(db.Model):
 
     def __repr__(self):
         return f"{self.name}"
+
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    author = db.Column(db.String, unique=False, nullable=False)
+    date_posted = db.Column(db.DateTime, unique=False, nullable=False, default=datetime.utcnow)
+    content = db.Column(db.Text, unique=False, nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    under = db.relationship('Post', back_populates='comment_list')
