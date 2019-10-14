@@ -67,7 +67,7 @@ def post_edit(post_id):
         return redirect(url_for('posts.post', post_id=post.id))
     elif request.method == 'GET':
         form.picture.data = post.picture
-        form.tags.data = post.tag_list
+        form.tags.data = post.edit_tags
     return render_template('upload.html', title='Edit', post=post, form=form, info=info, searchform=searchform)
 
 
