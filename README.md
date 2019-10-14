@@ -3,19 +3,7 @@
 
 navigate to directory
 
-$ python3 
-
-\>>> from package import create_app, db
-
-\>>> app = create_app()
-
-\>>> ctx = app.app_context()
-
-\>>> ctx.push()
-
-\>>> db.create_all()
-
-\>>> exit()
+$ python3 create_db.py
 
 *To run:*
 
