@@ -51,6 +51,7 @@ class Post(db.Model):
     picture_w = db.Column(db.Integer, nullable=False)
     picture_h = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    edit_tags = db.Column(db.String, nullable=False)
     tag_list = db.relationship('Atable', back_populates='post')
     comment_list = db.relationship('Comment', back_populates='under')
 
