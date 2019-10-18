@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from package.models import User, Post, Tag, Atable
+from package.models import User, Post, Tag
 from package.posts.forms import SearchForm
 
 main = Blueprint('main', __name__)
@@ -18,7 +18,7 @@ def home():
 def search():
     try:
         tags = request.form['query'].split(', ')
-    except:
+    except KeyError:
         tags = [request.args.get('tag', type=str)]
     searchform = SearchForm()
     page = request.args.get('page', 1, type=int)
@@ -26,8 +26,8 @@ def search():
     for tag in tags:
         post_ids = Tag.query.filter_by(name=tag).first().post_list
         id_set = set()
-        for id in post_ids:
-            id_set.add(id.post_id)
+        for post_id in post_ids:
+            id_set.add(post_id.post_id)
         sets.append(id_set)
     while len(sets) > 1:
         sets[0] = sets[0].intersection(sets[1])

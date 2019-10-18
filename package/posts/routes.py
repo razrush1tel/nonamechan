@@ -1,8 +1,8 @@
 import os
-from flask import Blueprint, flash, render_template, url_for, redirect, request, abort, current_app
+from flask import Blueprint, render_template, url_for, redirect, request, abort, current_app
 from flask_login import current_user, login_required
 from package import db
-from package.models import User, Post, Tag, Atable, Comment
+from package.models import Post, Tag, Atable, Comment
 from package.posts.forms import SearchForm, UploadForm, CommentForm
 from package.users.utils import save_picture
 
@@ -35,7 +35,7 @@ def confirm_delete(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author == current_user or current_user.status == 'admin' or current_user.status == 'creator':
         picture_path = os.path.join(current_app.root_path, f'static/post_images/{post.picture}')
-        for i in range(len(post.tag_list)):
+        for _ in range(len(post.tag_list)):
             rel = Atable.query.filter_by(post_id=post.id).first()
             db.session.delete(rel)
             db.session.commit()
