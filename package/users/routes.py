@@ -81,7 +81,6 @@ def account(username):
 @login_required
 @users.route('/ban/<username>', methods=['POST'])
 def ban(username):
-    next_page = request.args.get('next')
     user = User.query.filter_by(username=username).first()
     user.status = 'banned'
     db.session.commit()
@@ -91,7 +90,6 @@ def ban(username):
 @login_required
 @users.route('/unban/<username>', methods=['POST'])
 def unban(username):
-    next_page = request.args.get('next')
     user = User.query.filter_by(username=username).first()
     user.status = 'active'
     db.session.commit()
