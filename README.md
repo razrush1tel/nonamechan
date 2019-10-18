@@ -5,7 +5,7 @@ navigate to directory
 
 $ python3 create_db.py
 
-*To run:*
+To run:
 
 $ python3 run.py
 

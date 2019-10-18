@@ -101,7 +101,6 @@ def unban(username):
 @login_required
 @users.route('/promote/<username>', methods=['POST'])
 def promote(username):
-    next_page = request.args.get('next')
     user = User.query.filter_by(username=username).first()
     user.role += 1
     db.session.commit()

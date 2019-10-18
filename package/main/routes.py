@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from package.models import User, Post, Tag
+from package.models import Post, Tag
 from package.posts.forms import SearchForm
 
 main = Blueprint('main', __name__)
