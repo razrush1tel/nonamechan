@@ -1,9 +1,9 @@
 import os
-from flask import Blueprint, render_template, url_for, flash, redirect, request, abort
+from flask import Blueprint, render_template, url_for, flash, redirect, request
 from flask_login import login_user, current_user, logout_user, login_required
 from package import db, bcrypt
 from package.models import User, Post
-from package.users.forms import (LogInForm, RegistrationForm, SearchForm, UploadForm,
+from package.users.forms import (LogInForm, RegistrationForm, SearchForm,
                         UpdateAccountForm, RequestResetForm, ResetPasswordForm)
 from package.users.utils import save_picture, send_reset_email
 
@@ -111,7 +111,6 @@ def promote(username):
 @login_required
 @users.route('/disapprove/<username>', methods=['POST'])
 def disapprove(username):
-    next_page = request.args.get('next')
     user = User.query.filter_by(username=username).first()
     user.role -= 1
     db.session.commit()
@@ -154,7 +153,6 @@ def reset_token(token):
         return redirect(url_for('users.utils.reset_request'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        status = 'active'
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user.password = hashed_password
         db.session.commit()
