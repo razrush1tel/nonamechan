@@ -65,6 +65,7 @@ class RequestResetForm(FlaskForm):
                         validators=[DataRequired(), Email()])
     submit = SubmitField('Request Reset')
 
+    @staticmethod
     def validate_email(self, email):
         email = User.query.filter_by(email=email.data).first()
         if email is None:
