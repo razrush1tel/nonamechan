@@ -2,7 +2,7 @@
 {% block content %}
 	<div class="container">
 		<img src="{{ url_for('static', filename='post_images/' + post.picture) }}"><br>
-		<a style="color: darkblue" href="{{ url_for('static', filename='post_images/' + post.picture) }}"><p>View original here</p></a>
+		<a style="color: darkblue" href="{{ url_for('static', filename='post_images/' + post.picture) }}"><p>View original</p></a>
 		{% if current_user.is_authenticated %}
 			{% if current_user.id == post.user_id or current_user.role > 0 %}
 				<a href="{{ url_for('posts.post_edit', post_id=post.id) }}" style="color:grey">Edit</a>
@@ -25,9 +25,9 @@
 			</div>
 		{% endfor %}
 		{% if current_user.is_authenticated %}
-			<form method="POST" action="">
+			<form method="POST" action="" style="">
 				{{ commentform.csrf_token }}
-				{{ commentform.content }}
+				{{ commentform.content(cols="120", rows="4") }}
 				{{ commentform.submit }}
 			</form>
 		{% else %}
