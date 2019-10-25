@@ -85,6 +85,7 @@ def upload():
         tags = form.tags.data.split(', ')
         print(tags)
         post = Post(picture=picture_file, picture_w=width, picture_h=height, author=current_user)
+        post.edit_tags = form.tags.data
         for i in tags:
             elem = Tag.query.filter_by(name=i).first()
             if not elem:
