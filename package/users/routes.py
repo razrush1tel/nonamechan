@@ -129,7 +129,7 @@ def favorites(username):
     searchform = SearchForm()
     page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
-    favorite_set = set([i.id for i in user.favorites])
+    favorite_set = set([i.fav_id for i in user.fav_list])
     print(favorite_set)
     posts = Post.query.filter(Post.id.in_(favorite_set)).order_by(Post.date_posted.desc()).paginate(per_page=24, page=page)
     return render_template('favorites.html', posts=posts, user=user, searchform=searchform)
