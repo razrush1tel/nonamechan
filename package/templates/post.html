@@ -8,6 +8,15 @@
 				<a href="{{ url_for('posts.post_edit', post_id=post.id) }}" style="color:grey">Edit</a>
 				<a href="{{ url_for('posts.post_delete', post_id=post.id) }}" style="color:red">Delete</a>
 			{% endif %}
+			{% if faved %}
+				<form method="POST" action="" style="">
+					<a href="{{ url_for('posts.remove_favorite', post_id=post.id)}}">Remove from Favorites</a>
+				</form>
+			{% else %}
+				<form method="POST" action="" style="">
+					<a href="{{ url_for('posts.add_favorite', post_id=post.id)}}">Add to Favorites</a>
+				</form>
+			{% endif %}
 		{% endif %}
 		<br>
 		<p>Tags: </p>

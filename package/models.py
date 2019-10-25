@@ -18,6 +18,7 @@ class User(db.Model, UserMixin):
     profile_pic = db.Column(db.String(20), unique=False, nullable=False, default='default.jpg')
     password = db.Column(db.String(60), unique=False, nullable=False)
     posts = db.relationship('Post', backref='author', lazy=True)
+    fav_list = db.relationship('Atable_fav', back_populates='liker', lazy=True)
 
     @staticmethod
     def get_reset_token(self, expires_sec=1800):
@@ -45,6 +46,14 @@ class Atable(db.Model):
     post = db.relationship('Post', back_populates='tag_list')
 
 
+class Atable_fav(db.Model):
+    __tablename__ = 'atable_fav'
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    fav_id = db.Column(db.Integer, db.ForeignKey('post.id'), primary_key=True)
+    fav = db.relationship('Post', back_populates='likers_list')
+    liker = db.relationship('User', back_populates='fav_list')
+
+
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_posted = db.Column(db.DateTime, unique=False, nullable=False, default=datetime.utcnow)
@@ -54,6 +63,7 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     edit_tags = db.Column(db.String, nullable=False)
     tag_list = db.relationship('Atable', back_populates='post')
+    likers_list = db.relationship('Atable_fav', back_populates='fav')
     comment_list = db.relationship('Comment', back_populates='under')
 
     def __repr__(self):
@@ -62,7 +72,7 @@ class Post(db.Model):
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True, nullable=False)
+    name = db.Column(db.String, unique=False, nullable=False)
     post_list = db.relationship('Atable', back_populates='tag')
 
     def __repr__(self):

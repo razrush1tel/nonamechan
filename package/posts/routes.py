@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, render_template, url_for, redirect, request, abort, current_app
 from flask_login import current_user, login_required
 from package import db
-from package.models import Post, Tag, Atable, Comment
+from package.models import Post, Tag, Atable, Atable_fav, Comment
 from package.posts.forms import SearchForm, UploadForm, CommentForm
 from package.users.utils import save_picture
 
@@ -11,6 +11,7 @@ posts = Blueprint('posts', __name__)
 
 @posts.route("/post/<int:post_id>", methods=['GET', 'POST'])
 def post(post_id):
+    flag = False
     commentform = CommentForm()
     searchform = SearchForm()
     post = Post.query.get_or_404(post_id)
@@ -19,7 +20,9 @@ def post(post_id):
         post.comment_list.append(comment)
         db.session.commit()
         return redirect(url_for('posts.post', post_id=post_id))
-    return render_template('post.html', title='Post', post=post, searchform=searchform, commentform=commentform)
+    if Atable_fav.query.filter_by(user_id=current_user.id, fav_id=post_id).first() is not None:
+        flag = True
+    return render_template('post.html', title='Post', post=post, searchform=searchform, commentform=commentform, faved=flag)
 
 
 @login_required
@@ -48,6 +51,25 @@ def confirm_delete(post_id):
 
 
 @login_required
+@posts.route('/favorite/<int:post_id>', methods=['GET', 'POST'])
+def add_favorite(post_id):
+    fav = Post.query.get(post_id)
+    new_record = Atable_fav(user_id=current_user.id, fav_id=fav.id)
+    db.session.add(new_record)
+    db.session.commit()
+    return redirect(url_for('posts.post', post_id=post_id))
+
+
+@login_required
+@posts.route('/unfavorite/<int:post_id>', methods=['GET', 'POST'])
+def remove_favorite(post_id):
+    rel = Atable_fav.query.filter_by(user_id=current_user.id, fav_id=post_id).first()
+    db.session.delete(rel)
+    db.session.commit()
+    return redirect(url_for('posts.post', post_id=post_id))
+
+
+@login_required
 @posts.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])
 def post_edit(post_id):
     searchform = SearchForm()
@@ -62,8 +84,30 @@ def post_edit(post_id):
             post.picture = picture_file
             post.width = width
             post.height = height
-        post.tag_list = form.tags.data
+        edit_tags_set = set(post.edit_tags.split(', '))
+        new_tags_set = set(form.tags.data.split(', '))
+        post.edit_tags = form.tags.data
         db.session.commit()
+        delete_tags = list(edit_tags_set - new_tags_set)
+        for i in delete_tags:
+            tag_to_del = Tag.query.filter_by(name=i).first()
+            rel = Atable.query.filter_by(tag_id=tag_to_del.id).first()
+            if rel is not None:
+                db.session.delete(rel)
+                db.session.commit()
+        append_tags = list(new_tags_set - edit_tags_set)
+        for i in append_tags:
+            elem = Tag.query.filter_by(name=i).first()
+            if not elem:
+                new_tag = Tag(name=i)
+                elem = new_tag
+                db.session.add(new_tag)
+                db.session.commit()
+            new_record = Atable(post_id=post.id, tag_id=elem.id)
+            # check if no record exists otherwise it will result int NOT_UNIQUE error
+            if not Atable.query.filter_by(post_id=post.id, tag_id=elem.id).first():
+                db.session.add(new_record)
+                db.session.commit()
         return redirect(url_for('posts.post', post_id=post.id))
     elif request.method == 'GET':
         form.picture.data = post.picture
@@ -86,6 +130,7 @@ def upload():
         print(tags)
         post = Post(picture=picture_file, picture_w=width, picture_h=height, author=current_user)
         post.edit_tags = form.tags.data
+        post.user_id = current_user.id
         for i in tags:
             elem = Tag.query.filter_by(name=i).first()
             if not elem:
