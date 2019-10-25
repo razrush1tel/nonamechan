@@ -4,6 +4,7 @@
   <img class="profile_pic" src="{{ image_file }}">
   <h1 class="account-name">{{ name }}</h1>
   <h1><a href="{{ url_for('users.author', username=name) }}">All Posts</a></h1>
+  <h1><a href="{{ url_for('users.favorites', username=name) }}">Favorites</a></h1>
   {% if current_user.role > 0 %}
     {% if user.status == 'active' and user.role < current_user.role %}
       <form method="POST" action="{{ url_for('users.ban', username=name) }}">

@@ -18,6 +18,7 @@ class User(db.Model, UserMixin):
     profile_pic = db.Column(db.String(20), unique=False, nullable=False, default='default.jpg')
     password = db.Column(db.String(60), unique=False, nullable=False)
     posts = db.relationship('Post', backref='author', lazy=True)
+    favorites = db.relationship('Post', backref='owner', lazy=True)
 
     @staticmethod
     def get_reset_token(self, expires_sec=1800):
@@ -51,7 +52,7 @@ class Post(db.Model):
     picture = db.Column(db.String(50), unique=False, nullable=False)
     picture_w = db.Column(db.Integer, nullable=False)
     picture_h = db.Column(db.Integer, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     edit_tags = db.Column(db.String, nullable=False)
     tag_list = db.relationship('Atable', back_populates='post')
     comment_list = db.relationship('Comment', back_populates='under')

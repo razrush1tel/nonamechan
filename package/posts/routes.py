@@ -11,6 +11,7 @@ posts = Blueprint('posts', __name__)
 
 @posts.route("/post/<int:post_id>", methods=['GET', 'POST'])
 def post(post_id):
+    print(current_user.favorites)
     commentform = CommentForm()
     searchform = SearchForm()
     post = Post.query.get_or_404(post_id)
@@ -45,6 +46,26 @@ def confirm_delete(post_id):
     else:
         abort(403)
     return redirect(url_for('main.home'))
+
+
+@login_required
+@posts.route('/favorite/<int:post_id>', methods=['GET', 'POST'])
+def add_favorite(post_id):
+    post = Post.query.get(post_id)
+    current_user.favorites.append(post)
+    db.session.commit()
+    return redirect(url_for('posts.post', post_id=post_id))
+
+
+@login_required
+@posts.route('/unfavorite/<int:post_id>', methods=['GET', 'POST'])
+def remove_favorite(post_id):
+    post = Post.query.get(post_id)
+    print(current_user.id)
+    post.user_id = current_user.id
+    current_user.favorites.remove(post)
+    db.session.commit()
+    return redirect(url_for('posts.post', post_id=post_id))
 
 
 @login_required
