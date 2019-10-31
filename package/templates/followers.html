@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+  {% for follower in followers %}
+  <a href="{{ url_for('users.account', username=follower.username) }}">
+      <div class="user_tile">
+          <img class="hp-image" src="{{ url_for('static', filename='profile_pics/' + follower.profile_pic) }}" style="width:215px;height:215px;">
+          <a style="color: darkblue; display:block;" href="{{ url_for('users.account', username=follower.username) }}">{{ follower.username }}</a>
+      </div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock content %}

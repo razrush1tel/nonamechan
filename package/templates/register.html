@@ -2,32 +2,32 @@
 {% block content %}
 <div class="container">
   <form method="POST" action="">
-    {{ form.csrf_token }}
-    {{ form.username.label(class="form-control") }}
-    {{ form.username(class="form-control") }}
-    {% if form.username.errors %}
-      {% for error in form.username.errors %}
+    {{ registerform.csrf_token }}
+    {{ registerform.username.label(class="form-control") }}
+    {{ registerform.username(class="form-control") }}
+    {% if registerform.username.errors %}
+      {% for error in registerform.username.errors %}
           <p>{{ error }}</p>
       {% endfor %}
     {% endif %}
     <br>
-    {{ form.email.label(class="form-control") }}
-    {{ form.email(class="form-control") }}
-    {% if form.email.errors %}
-      {% for error in form.email.errors %}
+    {{ registerform.email.label(class="form-control") }}
+    {{ registerform.email(class="form-control") }}
+    {% if registerform.email.errors %}
+      {% for error in registerform.email.errors %}
           <p>{{ error }}</p>
       {% endfor %}
     {% endif %}
     <br>
-    {{ form.password.label(class="form-control") }}
-    {{ form.password(class="form-control") }}
-    {% if form.password.errors %}
-      {% for error in form.password.errors %}
+    {{ registerform.password.label(class="form-control") }}
+    {{ registerform.password(class="form-control") }}
+    {% if registerform.password.errors %}
+      {% for error in registerform.password.errors %}
           <p>{{ error }}</p>
       {% endfor %}
     {% endif %}
     <br>
-    {{ form.submit(class="form-control") }}
+    {{ registerform.submit(class="form-control") }}
   </form>
 </div>
 {% endblock content %}

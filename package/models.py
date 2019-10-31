@@ -35,11 +35,11 @@ class User(db.Model, UserMixin):
         return User.query.get(user_id)
 
     def __repr__(self):
-        return f"User('{self.username}', '{self.email}', '{self.password}')"
+        return f"User('{self.username}', '{self.email}', '{self.profile_pic}')"
 
 
-class Atable(db.Model):
-    __tablename__ = 'atable'
+class Atable_tag(db.Model):
+    __tablename__ = 'atable_tag'
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), primary_key=True)
     tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'), primary_key=True)
     tag = db.relationship('Tag', back_populates='post_list')
@@ -54,6 +54,13 @@ class Atable_fav(db.Model):
     liker = db.relationship('User', back_populates='fav_list')
 
 
+class Atable_subs(db.Model):
+    __tablename__ = 'atable_subs'
+    cmaker_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    sub_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+
+
+
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_posted = db.Column(db.DateTime, unique=False, nullable=False, default=datetime.utcnow)
@@ -62,7 +69,7 @@ class Post(db.Model):
     picture_h = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     edit_tags = db.Column(db.String, nullable=False)
-    tag_list = db.relationship('Atable', back_populates='post')
+    tag_list = db.relationship('Atable_tag', back_populates='post')
     likers_list = db.relationship('Atable_fav', back_populates='fav')
     comment_list = db.relationship('Comment', back_populates='under')
 
@@ -73,7 +80,7 @@ class Post(db.Model):
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=False, nullable=False)
-    post_list = db.relationship('Atable', back_populates='tag')
+    post_list = db.relationship('Atable_tag', back_populates='tag')
 
     def __repr__(self):
         return f"{self.name}"

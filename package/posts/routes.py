@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, render_template, url_for, redirect, request, abort, current_app
 from flask_login import current_user, login_required
 from package import db
-from package.models import Post, Tag, Atable, Atable_fav, Comment
+from package.models import Post, Tag, Atable_tag, Atable_fav, Comment
 from package.posts.forms import SearchForm, UploadForm, CommentForm
 from package.users.utils import save_picture
 
@@ -39,7 +39,7 @@ def confirm_delete(post_id):
     if post.author == current_user or current_user.status == 'admin' or current_user.status == 'creator':
         picture_path = os.path.join(current_app.root_path, f'static/post_images/{post.picture}')
         for _ in range(len(post.tag_list)):
-            rel = Atable.query.filter_by(post_id=post.id).first()
+            rel = Atable_tag.query.filter_by(post_id=post.id).first()
             db.session.delete(rel)
             db.session.commit()
         db.session.delete(post)
@@ -75,23 +75,23 @@ def post_edit(post_id):
     searchform = SearchForm()
     info = "Max size is 256kB. Leave blank if you don't want to change picture"
     post = Post.query.get_or_404(post_id)
-    form = UploadForm()
+    uploadform = UploadForm()
     if post.author != current_user and current_user.role == 0:
         abort(403)
-    if form.validate_on_submit():
-        if form.picture.data:
-            picture_file, width, height = save_picture(form.picture.data, 'no', 'post_images')
+    if uploadform.validate_on_submit():
+        if uploadform.picture.data:
+            picture_file, width, height = save_picture(uploadform.picture.data, 'no', 'post_images')
             post.picture = picture_file
             post.width = width
             post.height = height
         edit_tags_set = set(post.edit_tags.split(', '))
-        new_tags_set = set(form.tags.data.split(', '))
-        post.edit_tags = form.tags.data
+        new_tags_set = set(uploadform.tags.data.split(', '))
+        post.edit_tags = uploadform.tags.data
         db.session.commit()
         delete_tags = list(edit_tags_set - new_tags_set)
         for i in delete_tags:
             tag_to_del = Tag.query.filter_by(name=i).first()
-            rel = Atable.query.filter_by(tag_id=tag_to_del.id).first()
+            rel = Atable_tag.query.filter_by(tag_id=tag_to_del.id).first()
             if rel is not None:
                 db.session.delete(rel)
                 db.session.commit()
@@ -103,16 +103,16 @@ def post_edit(post_id):
                 elem = new_tag
                 db.session.add(new_tag)
                 db.session.commit()
-            new_record = Atable(post_id=post.id, tag_id=elem.id)
+            new_record = Atable_tag(post_id=post.id, tag_id=elem.id)
             # check if no record exists otherwise it will result int NOT_UNIQUE error
-            if not Atable.query.filter_by(post_id=post.id, tag_id=elem.id).first():
+            if not Atable_tag.query.filter_by(post_id=post.id, tag_id=elem.id).first():
                 db.session.add(new_record)
                 db.session.commit()
         return redirect(url_for('posts.post', post_id=post.id))
     elif request.method == 'GET':
-        form.picture.data = post.picture
-        form.tags.data = post.edit_tags
-    return render_template('upload.html', title='Edit', post=post, form=form, info=info, searchform=searchform)
+        uploadform.picture.data = post.picture
+        uploadform.tags.data = post.edit_tags
+    return render_template('upload.html', title='Edit', post=post, uploadform=uploadform, info=info, searchform=searchform)
 
 
 
@@ -123,13 +123,13 @@ def upload():
     if current_user.status == 'banned':
         return render_template('banned.html')
     info = "Max size is 256kB."
-    form = UploadForm()
-    if form.validate_on_submit():
-        picture_file, width, height = save_picture(form.picture.data, 'no', 'post_images')
-        tags = form.tags.data.split(', ')
+    uploadform = UploadForm()
+    if uploadform.validate_on_submit():
+        picture_file, width, height = save_picture(uploadform.picture.data, 'no', 'post_images')
+        tags = uploadform.tags.data.split(', ')
         print(tags)
         post = Post(picture=picture_file, picture_w=width, picture_h=height, author=current_user)
-        post.edit_tags = form.tags.data
+        post.edit_tags = uploadform.tags.data
         post.user_id = current_user.id
         for i in tags:
             elem = Tag.query.filter_by(name=i).first()
@@ -138,9 +138,9 @@ def upload():
                 elem = new_tag
                 db.session.add(new_tag)
                 db.session.commit()
-            new_record = Atable(post_id=post.id, tag_id=elem.id)
+            new_record = Atable_tag(post_id=post.id, tag_id=elem.id)
             db.session.add(new_record)
         db.session.add(post)
         db.session.commit()
         return redirect(url_for('main.home'))
-    return render_template('upload.html', title='Upload', form=form, info=info, searchform=searchform)
+    return render_template('upload.html', title='Upload', uploadform=uploadform, info=info, searchform=searchform)

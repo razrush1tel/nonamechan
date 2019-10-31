@@ -1,65 +1,79 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="container">
-  <img class="profile_pic" src="{{ image_file }}">
-  <h1 class="account-name">{{ name }}</h1>
-  <h1><a href="{{ url_for('users.author', username=name) }}">All Posts</a></h1>
-  <h1><a href="{{ url_for('users.favorites', username=name) }}">Favorites</a></h1>
-  {% if current_user.role > 0 %}
-    {% if user.status == 'active' and user.role < current_user.role %}
-      <form method="POST" action="{{ url_for('users.ban', username=name) }}">
-        <input type="submit" value="Ban" style="color:red">
-      </form>
-    {% elif user.status == 'banned' and user.role < current_user.role %}
-      <form method="POST" action="{{ url_for('users.unban', username=name) }}">
-        <input type="submit" value="Unban" style="color:green">
-      </form>
+    <img class="profile_pic" src="{{ image_file }}">
+    <h1 class="account-name">{{ name }}</h1>
+    {% if subscribed == 0 %}
+        <form method="POST" action="{{ url_for('users.follow', username=name) }}">
+            <input type="submit" value="Follow">
+        </form>
+    {% elif subscribed == 1 %}
+        <form method="POST" action="{{ url_for('users.unfollow', username=name) }}">
+            <input type="submit" value="Unfollow">
+        </form>
     {% endif %}
-  {% endif %}
-  {% if current_user.role == 2 %}
-    {% if user.role == 0 %}
-      <form method="POST" action="{{ url_for('users.promote', username=name) }}">
-        <input type="submit" value="Promote" style="color:green">
-      </form>
-    {% elif user.role == 1 %}
-      <form method="POST" action="{{ url_for('users.disapprove', username=name) }}">
-        <input type="submit" value="Disapprove" style="color:red">
-      </form>
+    <h1><a href="{{ url_for('users.author', username=name) }}">All Posts</a></h1>
+    <h1><a href="{{ url_for('users.favorites', username=name) }}">Favorites</a></h1>
+    {% if sub_count % 10 == 1 and sub_count % 100 != 11 %}
+        <h1><a href="{{ url_for('users.followers', username=name) }}">{{ sub_count }} Follower</a></h1>
+    {% else %}
+        <h1><a href="{{ url_for('users.followers', username=name) }}">{{ sub_count }} Followers</a></h1>
     {% endif %}
-  {% endif %}
-  {% if current_user.username == name %}
+    {% if current_user.role > 0 %}
+        {% if user.status == 'active' and user.role < current_user.role %}
+            <form method="POST" action="{{ url_for('users.ban', username=name) }}">
+                <input type="submit" value="Ban" style="color:red">
+            </form>
+            {% elif user.status == 'banned' and user.role < current_user.role %}
+            <form method="POST" action="{{ url_for('users.unban', username=name) }}">
+                <input type="submit" value="Unban" style="color:green">
+            </form>
+        {% endif %}
+    {% endif %}
+    {% if current_user.role == 2 %}
+        {% if user.role == 0 %}
+            <form method="POST" action="{{ url_for('users.promote', username=name) }}">
+                <input type="submit" value="Promote" style="color:green">
+            </form>
+            {% elif user.role == 1 %}
+            <form method="POST" action="{{ url_for('users.disapprove', username=name) }}">
+                <input type="submit" value="Disapprove" style="color:red">
+            </form>
+        {% endif %}
+    {% endif %}
+    {% if current_user.username == name %}
     <h3>Change info</h3>
     <form method="POST" action="" enctype="multipart/form-data">
-      {{ form.hidden_tag() }}
-      {{ form.username.label(class="form-control") }}
-      {{ form.username(class="form-control") }}
-      {% if form.username.errors %}
-        {% for error in form.username.errors %}
-          <p>{{ error }}</p>
-        {% endfor %}
-      {% endif %}
-      <br>
-      {{ form.email.label(class="form-control") }}
-      {{ form.email(class="form-control") }}
-      {% if form.email.errors %}
-        {% for error in form.email.errors %}
-          <p>{{ error }}</p>
-        {% endfor %}
-      {% endif %}
-      <br>
-      {{ form.picture.label }}
-      {{ form.picture }}
-      {% if form.picture.errors %}
-        {% for error in form.picture.errors %}
-          <span>{{ error }}</span><br>
-        {% endfor %}
-      {% endif %}
-      <br>
-      {{ form.submit(class="form-control") }}
+        {{ updateform.hidden_tag() }}
+        {{ updateform.username.label(class="form-control") }}
+        {{ updateform.username(class="form-control") }}
+        {% if updateform.username.errors %}
+            {% for error in updateform.username.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+        <br>
+        {{ updateform.email.label(class="form-control") }}
+        {{ updateform.email(class="form-control") }}
+        {% if updateform.email.errors %}
+            {% for error in updateform.email.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+        <br>
+        {{ updateform.picture.label }}
+        {{ updateform.picture }}
+        {% if updateform.picture.errors %}
+            {% for error in updateform.picture.errors %}
+                <span>{{ error }}</span><br>
+            {% endfor %}
+        {% endif %}
+        <br>
+        {{ updateform.submit(class="form-control") }}
     </form>
     <form class="btn-form" action="{{ url_for('users.logout') }}">
       <input type="submit" value="Logout">
     </form>
-  {% endif %}
+    {% endif %}
 </div>
 {% endblock %}

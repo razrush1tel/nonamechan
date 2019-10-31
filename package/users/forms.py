@@ -92,3 +92,8 @@ class UploadForm(FlaskForm):
     picture = FileField('Select file',
                             validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Upload')
+
+
+class SubscribeForm(FlaskForm):
+    follow = SubmitField('Follow')
+    unfollow = SubmitField('Unfollow')
