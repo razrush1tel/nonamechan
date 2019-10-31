@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
 <form method="POST" action="">
-  {{ form.csrf_token }}
-  {{ form.password.label(class="form-control") }}
-  {{ form.password(class="form-control") }}
-  {{ form.confirm_password.label(class="form-control") }}
-  {{ form.confirm_password(class="form-control") }}
-  {{ form.submit(class="form-control") }}
+  {{ resetform.csrf_token }}
+  {{ resetform.password.label(class="form-control") }}
+  {{ resetform.password(class="form-control") }}
+  {{ resetform.confirm_password.label(class="form-control") }}
+  {{ resetform.confirm_password(class="form-control") }}
+  {{ resetform.submit(class="form-control") }}
 </form>
 {% endblock content %}

@@ -1,23 +1,23 @@
 {% extends "layout.html" %}
 {% block content%}
 <form method="POST" action="" enctype="multipart/form-data">
-	{{ form.csrf_token }}
+	{{ uploadform.csrf_token }}
     <div class="upload-block">
         <br>
-        {{ form.picture.label }}
-    	{{ form.picture }}
+        {{ uploadform.picture.label }}
+    	{{ uploadform.picture }}
         <small>{{ info }}</small>
-        {% if form.picture.errors %}
-            {% for error in form.picture.errors %}
+        {% if uploadform.picture.errors %}
+            {% for error in uploadform.picture.errors %}
                 <p>{{ error }}</p>
             {% endfor %}
         {% endif %}
     	<br>
-        {{ form.tags.label }}
-        {{ form.tags }}
+        {{ uploadform.tags.label }}
+        {{ uploadform.tags }}
         <small>Separate tags my comma and use _ instead of space</small>
         <br>
-        {{ form.submit }}
+        {{ uploadform.submit }}
     </div>
 </form>
 {% endblock content%}
