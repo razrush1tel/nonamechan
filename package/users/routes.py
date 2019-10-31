@@ -61,12 +61,13 @@ def account(username):
     searchform = SearchForm()
     updateform = UpdateAccountForm()
     user = User.query.filter_by(username=username).first()
+    sub_count = len(Atable_subs.query.filter_by(cmaker_id=user.id).all())
     if user is None:
         pass # custom error page here
     if Atable_subs.query.filter_by(cmaker_id=user.id, sub_id=current_user.id).first() is not None:
         subs_flag = 1
     elif user.id == current_user.id:
-        subs_flag=2
+        subs_flag = 2
     if updateform.validate_on_submit():
         if updateform.picture.data:
             picture_file, _, _ = save_picture(updateform.picture.data, (250, 250), 'profile_pics')
@@ -81,10 +82,21 @@ def account(username):
         updateform.username.data = current_user.username
         updateform.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + user.profile_pic)
-    print(image_file)
     return render_template('account.html', title='Account', image_file=image_file,
                         updateform=updateform, searchform=searchform, name=username, user=user,
-                        subscribed=subs_flag)
+                        subscribed=subs_flag, sub_count=sub_count)
+
+
+@users.route("/followers/<username>", methods=['GET', 'POST'])
+@login_required
+def followers(username):
+    searchform = SearchForm()
+    user = User.query.filter_by(username=username).first()
+    followers_id = [i.sub_id for i in Atable_subs.query.filter_by(cmaker_id=user.id)]
+    followers = []
+    for i in followers_id:
+        followers.append(User.query.get(i))
+    return render_template('followers.html', title='Followers', followers=followers, searchform=searchform)
 
 
 @login_required

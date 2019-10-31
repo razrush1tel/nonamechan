@@ -35,7 +35,7 @@ class User(db.Model, UserMixin):
         return User.query.get(user_id)
 
     def __repr__(self):
-        return f"User('{self.username}', '{self.email}', '{self.password}')"
+        return f"User('{self.username}', '{self.email}', '{self.profile_pic}')"
 
 
 class Atable_tag(db.Model):
@@ -58,7 +58,7 @@ class Atable_subs(db.Model):
     __tablename__ = 'atable_subs'
     cmaker_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     sub_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    
+
 
 
 class Post(db.Model):
