@@ -54,3 +54,8 @@ package/static/
 
 # Keep db always by default
 package/site.db
+
+#venv
+lib64
+pyvenv.cfg
+share/
