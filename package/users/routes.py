@@ -2,9 +2,10 @@ import os
 from flask import Blueprint, render_template, url_for, flash, redirect, request
 from flask_login import login_user, current_user, logout_user, login_required
 from package import db, bcrypt
-from package.models import User, Post, Atable_subs
+from package.models import User, Post, Atable_subs, Comment
 from package.users.forms import (LogInForm, RegistrationForm, SearchForm, SubscribeForm,
                         UpdateAccountForm, RequestResetForm, ResetPasswordForm)
+from package.posts.forms import CommentForm
 from package.users.utils import save_picture, send_reset_email
 
 
@@ -60,6 +61,7 @@ def account(username):
     subs_flag = 0
     searchform = SearchForm()
     updateform = UpdateAccountForm()
+    commentform = CommentForm()
     user = User.query.filter_by(username=username).first()
     sub_count = len(Atable_subs.query.filter_by(cmaker_id=user.id).all())
     if user is None:
@@ -81,10 +83,15 @@ def account(username):
     elif request.method == 'GET':
         updateform.username.data = current_user.username
         updateform.email.data = current_user.email
+    if commentform.validate_on_submit():
+        comment = Comment(author=current_user.username, content=commentform.content.data, user_id=username)
+        user.comment_list.append(comment)
+        db.session.commit()
+        return redirect(url_for('users.account', username=username))
     image_file = url_for('static', filename='profile_pics/' + user.profile_pic)
     return render_template('account.html', title='Account', image_file=image_file,
                         updateform=updateform, searchform=searchform, name=username, user=user,
-                        subscribed=subs_flag, sub_count=sub_count)
+                        subscribed=subs_flag, sub_count=sub_count, commentform=commentform)
 
 
 @users.route("/followers/<username>", methods=['GET', 'POST'])

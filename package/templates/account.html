@@ -75,5 +75,32 @@
       <input type="submit" value="Logout">
     </form>
     {% endif %}
+    <br>
+    {% if user.status == 'banned' %}
+        {% for comment in user.comment_list %}
+            <div class="comment">
+                <p>By <a style="color: darkblue;" href="{{ url_for('users.account', username=comment.author) }}">{{ comment.author }}</a> at {{ comment.date_posted.strftime('%d-%m-%Y %H:%M:%S GMT') }}</p>
+                <br>
+                <p>{{ comment.content }}</p>
+            </div>
+        {% endfor %}
+        {% if current_user.is_authenticated %}
+            <form method="POST" action="" style="">
+                {{ commentform.csrf_token }}
+                {{ commentform.content(cols="120", rows="4") }}
+                {{ commentform.submit }}
+            </form>
+        {% else %}
+            <p>You need to log in to write comments</p>
+        {% endif %}
+    {% else %}
+        {% for comment in user.comment_list %}
+            <div class="comment">
+                <p>By <a style="color: darkblue;" href="{{ url_for('users.account', username=comment.author) }}">{{ comment.author }}</a> at {{ comment.date_posted.strftime('%d-%m-%Y %H:%M:%S GMT') }}</p>
+                <br>
+                <p>{{ comment.content }}</p>
+            </div>
+        {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}
