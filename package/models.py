@@ -19,6 +19,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), unique=False, nullable=False)
     posts = db.relationship('Post', backref='author', lazy=True)
     fav_list = db.relationship('Atable_fav', back_populates='liker', lazy=True)
+    comment_list = db.relationship('Comment', back_populates='under_user')
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
@@ -72,7 +73,7 @@ class Post(db.Model):
     edit_tags = db.Column(db.String, nullable=False)
     tag_list = db.relationship('Atable_tag', back_populates='post')
     likers_list = db.relationship('Atable_fav', back_populates='fav')
-    comment_list = db.relationship('Comment', back_populates='under')
+    comment_list = db.relationship('Comment', back_populates='under_post')
 
     def __repr__(self):
         return f"Post('{self.id}', '{self.date_posted}')"
@@ -93,4 +94,6 @@ class Comment(db.Model):
     date_posted = db.Column(db.DateTime, unique=False, nullable=False, default=datetime.utcnow)
     content = db.Column(db.Text, unique=False, nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
-    under = db.relationship('Post', back_populates='comment_list')
+    user_id = db.Column(db.String, db.ForeignKey('user.username'))
+    under_post = db.relationship('Post', back_populates='comment_list')
+    under_user = db.relationship('User', back_populates='comment_list')
