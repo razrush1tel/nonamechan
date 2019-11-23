@@ -75,6 +75,9 @@ def account(username):
             picture_file, _, _ = save_picture(updateform.picture.data, (250, 250), 'profile_pics')
             user.profile_pic = picture_file
             db.session.commit()
+        comments = Comment.query.filter_by(user_id=username)
+        for i in comments:
+            i.user_id = updateform.username.data
         current_user.username = updateform.username.data
         current_user.email = updateform.email.data
         db.session.commit()
