@@ -39,16 +39,18 @@ class User(db.Model, UserMixin):
 
 class Atable_tag(db.Model):
     __tablename__ = 'atable_tag'
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), primary_key=True)
-    tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'))
     tag = db.relationship('Tag', back_populates='post_list')
     post = db.relationship('Post', back_populates='tag_list')
 
 
 class Atable_fav(db.Model):
     __tablename__ = 'atable_fav'
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    fav_id = db.Column(db.Integer, db.ForeignKey('post.id'), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    fav_id = db.Column(db.Integer, db.ForeignKey('post.id'))
     fav = db.relationship('Post', back_populates='likers_list')
     liker = db.relationship('User', back_populates='fav_list')
 
@@ -90,5 +92,5 @@ class Comment(db.Model):
     author = db.Column(db.String, unique=False, nullable=False)
     date_posted = db.Column(db.DateTime, unique=False, nullable=False, default=datetime.utcnow)
     content = db.Column(db.Text, unique=False, nullable=False)
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
     under = db.relationship('Post', back_populates='comment_list')

@@ -38,10 +38,12 @@ def confirm_delete(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author == current_user or current_user.status == 'admin' or current_user.status == 'creator':
         picture_path = os.path.join(current_app.root_path, f'static/post_images/{post.picture}')
-        for _ in range(len(post.tag_list)):
-            rel = Atable_tag.query.filter_by(post_id=post.id).first()
-            db.session.delete(rel)
-            db.session.commit()
+        for i in post.tag_list:
+            print(i)
+            db.session.delete(i)
+        for i in post.likers_list:
+            rel_fav = Atable_fav.query.filter_by(user_id=i.user_id, fav_id=post.id).first()
+            db.session.delete(rel_fav)
         db.session.delete(post)
         db.session.commit()
         os.remove(picture_path)
