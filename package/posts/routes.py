@@ -8,7 +8,6 @@ from package.users.utils import save_picture
 
 posts = Blueprint('posts', __name__)
 
-
 @posts.route("/post/<int:post_id>", methods=['GET', 'POST'])
 def post(post_id):
     flag = False
@@ -20,8 +19,9 @@ def post(post_id):
         post.comment_list.append(comment)
         db.session.commit()
         return redirect(url_for('posts.post', post_id=post_id))
-    if Atable_fav.query.filter_by(user_id=current_user.id, fav_id=post_id).first() is not None:
-        flag = True
+    if current_user.is_authenticated:
+        if Atable_fav.query.filter_by(user_id=current_user.id, fav_id=post_id).first() is not None:
+            flag = True
     return render_template('post.html', title='Post', post=post, searchform=searchform, commentform=commentform, faved=flag)
 
 
