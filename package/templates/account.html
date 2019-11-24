@@ -41,39 +41,39 @@
             </form>
         {% endif %}
     {% endif %}
-    {% if current_user.username == name %}
-    <h3>Change info</h3>
-    <form method="POST" action="" enctype="multipart/form-data">
-        {{ updateform.hidden_tag() }}
-        {{ updateform.username.label(class="form-control") }}
-        {{ updateform.username(class="form-control") }}
-        {% if updateform.username.errors %}
-            {% for error in updateform.username.errors %}
-                <p>{{ error }}</p>
-            {% endfor %}
-        {% endif %}
-        <br>
-        {{ updateform.email.label(class="form-control") }}
-        {{ updateform.email(class="form-control") }}
-        {% if updateform.email.errors %}
-            {% for error in updateform.email.errors %}
-                <p>{{ error }}</p>
-            {% endfor %}
-        {% endif %}
-        <br>
-        {{ updateform.picture.label }}
-        {{ updateform.picture }}
-        {% if updateform.picture.errors %}
-            {% for error in updateform.picture.errors %}
-                <span>{{ error }}</span><br>
-            {% endfor %}
-        {% endif %}
-        <br>
-        {{ updateform.submit(class="form-control") }}
-    </form>
-    <form class="btn-form" action="{{ url_for('users.logout') }}">
-      <input type="submit" value="Logout">
-    </form>
+    {% if current_user.username == name and current_user.status == 'active' %}
+      <h3>Change info</h3>
+      <form method="POST" action="" enctype="multipart/form-data">
+          {{ updateform.hidden_tag() }}
+          {{ updateform.username.label(class="form-control") }}
+          {{ updateform.username(class="form-control") }}
+          {% if updateform.username.errors %}
+              {% for error in updateform.username.errors %}
+                  <p>{{ error }}</p>
+              {% endfor %}
+          {% endif %}
+          <br>
+          {{ updateform.email.label(class="form-control") }}
+          {{ updateform.email(class="form-control") }}
+          {% if updateform.email.errors %}
+              {% for error in updateform.email.errors %}
+                  <p>{{ error }}</p>
+              {% endfor %}
+          {% endif %}
+          <br>
+          {{ updateform.picture.label }}
+          {{ updateform.picture }}
+          {% if updateform.picture.errors %}
+              {% for error in updateform.picture.errors %}
+                  <span>{{ error }}</span><br>
+              {% endfor %}
+          {% endif %}
+          <br>
+          {{ updateform.submit(class="form-control") }}
+      </form>
+      <form class="btn-form" action="{{ url_for('users.logout') }}">
+        <input type="submit" value="Logout">
+      </form>
     {% endif %}
     <br>
     {% if user.status == 'banned' %}
@@ -84,14 +84,16 @@
                 <p>{{ comment.content }}</p>
             </div>
         {% endfor %}
-        {% if current_user.is_authenticated %}
+        {% if current_user.is_authenticated and not current_user.username == user.username %}
             <form method="POST" action="" style="">
                 {{ commentform.csrf_token }}
                 {{ commentform.content(cols="120", rows="4") }}
                 {{ commentform.submit }}
             </form>
-        {% else %}
+        {% elif not current_user.is_authenticated %}
             <p>You need to log in to write comments</p>
+        {% elif current_user.username == user.username %}
+            <p>You can't comment on your page</p>
         {% endif %}
     {% else %}
         {% for comment in user.comment_list %}
