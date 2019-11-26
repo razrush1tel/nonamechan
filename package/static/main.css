@@ -110,4 +110,15 @@ body {
   border-width: 1px;
   margin-bottom: 10px;
   padding-left: 10px;
+  min-height: 100px;
+}
+
+.notification {
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+  padding-left: 10px;
+  min-height: 70px;
+  max-width: 500px;
+  margin-bottom: 10px;
 }

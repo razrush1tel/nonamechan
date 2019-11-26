@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, render_template, url_for, flash, redirect, request
 from flask_login import login_user, current_user, logout_user, login_required
 from package import db, bcrypt
-from package.models import User, Post, Atable_subs, Comment
+from package.models import User, Post, Atable_subs, Atable_notif, Notification, Comment
 from package.users.forms import (LogInForm, RegistrationForm, SearchForm, SubscribeForm,
                         UpdateAccountForm, RequestResetForm, ResetPasswordForm)
 from package.posts.forms import CommentForm
@@ -97,6 +97,19 @@ def account(username):
                         subscribed=subs_flag, sub_count=sub_count, commentform=commentform)
 
 
+@users.route("/notifications/<username>", methods=['GET', 'POST'])
+@login_required
+def notifications(username):
+    searchform = SearchForm()
+    received = Atable_notif.query.filter_by(recip_id=current_user.id)
+    notif_set = set([elem.notif_id for elem in received])
+    notif_list = Notification.query.filter(Notification.id.in_(notif_set)).order_by(Notification.date.desc())
+    for del_notif in received:
+        db.session.delete(del_notif)
+    db.session.commit()
+    return render_template('notifications.html', title='Notification', notif_list=notif_list, searchform=searchform)
+
+
 @users.route("/followers/<username>", methods=['GET', 'POST'])
 @login_required
 def followers(username):
@@ -134,6 +147,12 @@ def unfollow(username):
 def ban(username):
     user = User.query.filter_by(username=username).first()
     user.status = 'banned'
+    notification = Notification(username=user.username, type='ban', content=" has been banned")
+    db.session.add(notification)
+    allusers = User.query.all()
+    for elem in allusers:
+        rel_notif = Atable_notif(notif_id=notification.id, recip_id=elem.id)
+        db.session.add(rel_notif)
     db.session.commit()
     return redirect(url_for('users.account', username=username))
 

@@ -19,7 +19,10 @@
         <form class="btn-form" action="{{ url_for('users.account', username=current_user.username) }}">
           <input type="submit" value="Account">
         </form>
-        {% else %}
+        <form class="btn-form" action="{{ url_for('users.notifications', username=current_user.username) }}">
+          <input type="submit" value="Notifications">
+        </form>
+      {% else %}
         <form class="btn-form" class="btn-form" action="{{ url_for('users.register') }}">
           <input type="submit" value="Register">
         </form>

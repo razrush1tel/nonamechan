@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, render_template, url_for, redirect, request, abort, current_app
 from flask_login import current_user, login_required
 from package import db
-from package.models import Post, Tag, Atable_tag, Atable_fav, Comment
+from package.models import Post, Tag, Atable_tag, Atable_fav, Atable_notif, Atable_subs, Comment, Notification
 from package.posts.forms import SearchForm, UploadForm, CommentForm
 from package.users.utils import save_picture
 
@@ -44,6 +44,11 @@ def confirm_delete(post_id):
         for i in post.likers_list:
             rel_fav = Atable_fav.query.filter_by(user_id=i.user_id, fav_id=post.id).first()
             db.session.delete(rel_fav)
+        del_notif = Notification.query.filter_by(post_id=post.id).first()
+        if del_notif is not None:
+            for rel in Atable_notif.query.filter_by(notif_id=del_notif.id):
+                db.session.delete(rel)
+        db.session.delete(del_notif)
         db.session.delete(post)
         db.session.commit()
         os.remove(picture_path)
@@ -129,7 +134,6 @@ def upload():
     if uploadform.validate_on_submit():
         picture_file, width, height = save_picture(uploadform.picture.data, 'no', 'post_images')
         tags = uploadform.tags.data.split(', ')
-        print(tags)
         post = Post(picture=picture_file, picture_w=width, picture_h=height, author=current_user)
         post.edit_tags = uploadform.tags.data
         post.user_id = current_user.id
@@ -139,10 +143,15 @@ def upload():
                 new_tag = Tag(name=i)
                 elem = new_tag
                 db.session.add(new_tag)
-                db.session.commit()
             new_record = Atable_tag(post_id=post.id, tag_id=elem.id)
             db.session.add(new_record)
         db.session.add(post)
+        notification = Notification(username=current_user.username, post_id=post.id, type='upload', content=" uploaded a new ")
+        db.session.add(notification)
+        followers_id = [i.sub_id for i in Atable_subs.query.filter_by(cmaker_id=current_user.id)]
+        for f_id in followers_id:
+            rel_notif = Atable_notif(notif_id=notification.id, recip_id=f_id)
+            db.session.add(rel_notif)
         db.session.commit()
         return redirect(url_for('main.home'))
     return render_template('upload.html', title='Upload', uploadform=uploadform, info=info, searchform=searchform)
