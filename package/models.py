@@ -38,31 +38,6 @@ class User(db.Model, UserMixin):
         return f"User('{self.username}', '{self.email}', '{self.profile_pic}')"
 
 
-class Atable_tag(db.Model):
-    __tablename__ = 'atable_tag'
-    id = db.Column(db.Integer, primary_key=True)
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
-    tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'))
-    tag = db.relationship('Tag', back_populates='post_list')
-    post = db.relationship('Post', back_populates='tag_list')
-
-
-class Atable_fav(db.Model):
-    __tablename__ = 'atable_fav'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    fav_id = db.Column(db.Integer, db.ForeignKey('post.id'))
-    fav = db.relationship('Post', back_populates='likers_list')
-    liker = db.relationship('User', back_populates='fav_list')
-
-
-class Atable_subs(db.Model):
-    __tablename__ = 'atable_subs'
-    cmaker_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    sub_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-
-
-
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_posted = db.Column(db.DateTime, unique=False, nullable=False, default=datetime.utcnow)
@@ -88,6 +63,31 @@ class Tag(db.Model):
         return f"{self.name}"
 
 
+class Atable_tag(db.Model):
+    __tablename__ = 'atable_tag'
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'))
+    tag = db.relationship('Tag', back_populates='post_list')
+    post = db.relationship('Post', back_populates='tag_list')
+
+
+class Atable_fav(db.Model):
+    __tablename__ = 'atable_fav'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    fav_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    fav = db.relationship('Post', back_populates='likers_list')
+    liker = db.relationship('User', back_populates='fav_list')
+
+
+class Atable_subs(db.Model):
+    __tablename__ = 'atable_subs'
+    cmaker_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    sub_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+
+
+
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String, unique=False, nullable=False)
@@ -97,3 +97,17 @@ class Comment(db.Model):
     user_id = db.Column(db.String, db.ForeignKey('user.username'))
     under_post = db.relationship('Post', back_populates='comment_list')
     under_user = db.relationship('User', back_populates='comment_list')
+
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, nullable=True)
+    username = db.Column(db.String, nullable=True)
+    type = db.Column(db.String, unique=False, nullable=False)
+    content = db.Column(db.String, unique=False, nullable=False)
+    date = db.Column(db.DateTime, unique=False, nullable=False, default=datetime.utcnow)
+
+class Atable_notif(db.Model):
+    __tablename__ = 'atable_notif'
+    notif_id = db.Column(db.Integer, db.ForeignKey('notification.id'), primary_key=True)
+    recip_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
