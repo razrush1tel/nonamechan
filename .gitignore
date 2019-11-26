@@ -50,7 +50,8 @@ coverage.xml
 docs/_build/
 
 # Images
-package/static/
+package/static/post_images/
+package/static/profile_pics/
 
 # Keep db always by default
 package/site.db
