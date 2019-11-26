@@ -114,8 +114,8 @@ body {
 }
 
 .notification {
-  border-style: solid;
   border-color: black;
+  border-style: solid;
   border-width: 1px;
   padding-left: 10px;
   min-height: 70px;
