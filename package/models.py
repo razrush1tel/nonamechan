@@ -20,6 +20,7 @@ class User(db.Model, UserMixin):
     posts = db.relationship('Post', backref='author', lazy=True)
     fav_list = db.relationship('Atable_fav', back_populates='liker', lazy=True)
     comment_list = db.relationship('Comment', back_populates='under_user')
+    notif_list = db.relationship('Atable_notif', back_populates='recipient')
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
@@ -87,7 +88,6 @@ class Atable_subs(db.Model):
     sub_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
 
 
-
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String, unique=False, nullable=False)
@@ -106,8 +106,11 @@ class Notification(db.Model):
     type = db.Column(db.String, unique=False, nullable=False)
     content = db.Column(db.String, unique=False, nullable=False)
     date = db.Column(db.DateTime, unique=False, nullable=False, default=datetime.utcnow)
+    recip_list = db.relationship('Atable_notif', back_populates='notification')
 
 class Atable_notif(db.Model):
     __tablename__ = 'atable_notif'
     notif_id = db.Column(db.Integer, db.ForeignKey('notification.id'), primary_key=True)
     recip_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    notification = db.relationship('Notification', back_populates='recip_list')
+    recipient = db.relationship('User', back_populates='notif_list')

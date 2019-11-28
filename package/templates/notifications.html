@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="container">
-  {% if notif_list is not none %}
+  {% if no_notif %}
+    <h3>No notifications</h3>
+  {% else %}
     {% for notification in notif_list %}
       <div class="notification">
         {% if notification.type == 'ban' %}
