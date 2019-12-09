@@ -3,7 +3,7 @@ import os
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
-    MAX_CONTENT_LENGTH = 2048 * 1024
+    MAX_CONTENT_LENGTH = 4096 * 1024
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
