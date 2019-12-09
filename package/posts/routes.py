@@ -80,7 +80,7 @@ def remove_favorite(post_id):
 @posts.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])
 def post_edit(post_id):
     searchform = SearchForm()
-    info = "Max size is 2048KB. Leave blank if you don't want to change picture"
+    info = "Max size is 4096KB. Leave blank if you don't want to change picture"
     post = Post.query.get_or_404(post_id)
     uploadform = UploadForm()
     if post.author != current_user and current_user.role == 0:
@@ -129,7 +129,7 @@ def upload():
     searchform = SearchForm()
     if current_user.status == 'banned':
         return render_template('banned.html')
-    info = "Max size is 2048KB."
+    info = "Max size is 4096KB."
     uploadform = UploadForm()
     if uploadform.validate_on_submit():
         picture_file, width, height = save_picture(uploadform.picture.data, 'no', 'post_images')
@@ -145,6 +145,7 @@ def upload():
                 db.session.add(new_tag)
             new_record = Atable_tag(post_id=post.id, tag_id=elem.id)
             db.session.add(new_record)
+            db.session.commit()
         db.session.add(post)
         notification = Notification(username=current_user.username, post_id=post.id, type='upload', content=" uploaded a new ")
         db.session.add(notification)
