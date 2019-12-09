@@ -80,7 +80,7 @@ def remove_favorite(post_id):
 @posts.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])
 def post_edit(post_id):
     searchform = SearchForm()
-    info = "Max size is 256kB. Leave blank if you don't want to change picture"
+    info = "Max size is 2048KB. Leave blank if you don't want to change picture"
     post = Post.query.get_or_404(post_id)
     uploadform = UploadForm()
     if post.author != current_user and current_user.role == 0:
@@ -129,7 +129,7 @@ def upload():
     searchform = SearchForm()
     if current_user.status == 'banned':
         return render_template('banned.html')
-    info = "Max size is 256kB."
+    info = "Max size is 2048KB."
     uploadform = UploadForm()
     if uploadform.validate_on_submit():
         picture_file, width, height = save_picture(uploadform.picture.data, 'no', 'post_images')
