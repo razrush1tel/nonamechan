@@ -134,15 +134,18 @@ def upload():
     if uploadform.validate_on_submit():
         picture_file, width, height = save_picture(uploadform.picture.data, 'no', 'post_images')
         tags = uploadform.tags.data.split(', ')
+        print(tags)
         post = Post(picture=picture_file, picture_w=width, picture_h=height, author=current_user)
         post.edit_tags = uploadform.tags.data
         post.user_id = current_user.id
         for i in tags:
             elem = Tag.query.filter_by(name=i).first()
+            print(elem)
             if not elem:
                 new_tag = Tag(name=i)
                 elem = new_tag
                 db.session.add(new_tag)
+                db.session.commit()
             new_record = Atable_tag(post_id=post.id, tag_id=elem.id)
             db.session.add(new_record)
             db.session.commit()
