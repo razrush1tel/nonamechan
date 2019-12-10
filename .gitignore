@@ -60,3 +60,6 @@ package/site.db
 lib64
 pyvenv.cfg
 share/
+
+#heroku locals
+.env
