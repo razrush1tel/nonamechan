@@ -63,38 +63,40 @@ def account(username):
     updateform = UpdateAccountForm()
     commentform = CommentForm()
     user = User.query.filter_by(username=username).first()
-    sub_count = len(Atable_subs.query.filter_by(cmaker_id=user.id).all())
+
     if user is None:
-        pass # custom error page here
-    if Atable_subs.query.filter_by(cmaker_id=user.id, sub_id=current_user.id).first() is not None:
-        subs_flag = 1
-    elif user.id == current_user.id:
-        subs_flag = 2
-    if updateform.validate_on_submit():
-        if updateform.picture.data:
-            picture_file, _, _ = save_picture(updateform.picture.data, (250, 250), 'profile_pics')
-            user.profile_pic = picture_file
+        return render_template('no_user.html', title='Account', searchform=searchform)
+    else:
+        sub_count = len(Atable_subs.query.filter_by(cmaker_id=user.id).all())
+        if Atable_subs.query.filter_by(cmaker_id=user.id, sub_id=current_user.id).first() is not None:
+            subs_flag = 1
+        elif user.id == current_user.id:
+            subs_flag = 2
+        if updateform.validate_on_submit():
+            if updateform.picture.data:
+                picture_file, _, _ = save_picture(updateform.picture.data, (250, 250), 'profile_pics')
+                user.profile_pic = picture_file
+                db.session.commit()
+            comments = Comment.query.filter_by(user_id=username)
+            for i in comments:
+                i.user_id = updateform.username.data
+            current_user.username = updateform.username.data
+            current_user.email = updateform.email.data
             db.session.commit()
-        comments = Comment.query.filter_by(user_id=username)
-        for i in comments:
-            i.user_id = updateform.username.data
-        current_user.username = updateform.username.data
-        current_user.email = updateform.email.data
-        db.session.commit()
-        flash('Your account has been updated', 'success')
-        return redirect(url_for('users.account', username=updateform.username.data))
-    elif request.method == 'GET':
-        updateform.username.data = current_user.username
-        updateform.email.data = current_user.email
-    if commentform.validate_on_submit():
-        comment = Comment(author=current_user.username, content=commentform.content.data, user_id=username)
-        user.comment_list.append(comment)
-        db.session.commit()
-        return redirect(url_for('users.account', username=username))
-    image_file = url_for('static', filename='profile_pics/' + user.profile_pic)
-    return render_template('account.html', title='Account', image_file=image_file,
-                        updateform=updateform, searchform=searchform, name=username, user=user,
-                        subscribed=subs_flag, sub_count=sub_count, commentform=commentform)
+            flash('Your account has been updated', 'success')
+            return redirect(url_for('users.account', username=updateform.username.data))
+        elif request.method == 'GET':
+            updateform.username.data = current_user.username
+            updateform.email.data = current_user.email
+        if commentform.validate_on_submit():
+            comment = Comment(author=current_user.username, content=commentform.content.data, user_id=username)
+            user.comment_list.append(comment)
+            db.session.commit()
+            return redirect(url_for('users.account', username=username))
+        image_file = url_for('static', filename='profile_pics/' + user.profile_pic)
+        return render_template('account.html', title='Account', image_file=image_file,
+                            updateform=updateform, searchform=searchform, name=username, user=user,
+                            subscribed=subs_flag, sub_count=sub_count, commentform=commentform)
 
 
 @users.route("/notifications/<username>", methods=['GET', 'POST'])
