@@ -4,6 +4,7 @@ from flask_login import current_user, login_required
 from package import db
 from package.models import Post, Tag, Atable_tag, Atable_fav, Atable_notif, Atable_subs, Comment, Notification
 from package.posts.forms import SearchForm, UploadForm, CommentForm
+from package.users.forms import LogInForm
 from package.users.utils import save_picture
 
 posts = Blueprint('posts', __name__)
@@ -127,35 +128,39 @@ def post_edit(post_id):
 @posts.route('/upload', methods=['GET', 'POST'])
 def upload():
     searchform = SearchForm()
-    if current_user.status == 'banned':
-        return render_template('banned.html')
-    info = "Max size is 4096KB."
-    uploadform = UploadForm()
-    if uploadform.validate_on_submit():
-        picture_file, width, height = save_picture(uploadform.picture.data, 'no', 'post_images')
-        tags = uploadform.tags.data.split(', ')
-        print(tags)
-        post = Post(picture=picture_file, picture_w=width, picture_h=height, author=current_user)
-        post.edit_tags = uploadform.tags.data
-        post.user_id = current_user.id
-        for i in tags:
-            elem = Tag.query.filter_by(name=i).first()
-            print(elem)
-            if not elem:
-                new_tag = Tag(name=i)
-                elem = new_tag
-                db.session.add(new_tag)
+    if current_user.is_authenticated:
+        if current_user.status == 'banned':
+            return render_template('banned.html')
+        info = "Max size is 4096KB."
+        uploadform = UploadForm()
+        if uploadform.validate_on_submit():
+            picture_file, width, height = save_picture(uploadform.picture.data, 'no', 'post_images')
+            tags = uploadform.tags.data.split(', ')
+            print(tags)
+            post = Post(picture=picture_file, picture_w=width, picture_h=height, author=current_user)
+            post.edit_tags = uploadform.tags.data
+            post.user_id = current_user.id
+            for i in tags:
+                elem = Tag.query.filter_by(name=i).first()
+                print(elem)
+                if not elem:
+                    new_tag = Tag(name=i)
+                    elem = new_tag
+                    db.session.add(new_tag)
+                    db.session.commit()
+                new_record = Atable_tag(post_id=post.id, tag_id=elem.id)
+                db.session.add(new_record)
                 db.session.commit()
-            new_record = Atable_tag(post_id=post.id, tag_id=elem.id)
-            db.session.add(new_record)
+            db.session.add(post)
+            notification = Notification(username=current_user.username, post_id=post.id, type='upload', content=" uploaded a new ")
+            db.session.add(notification)
+            followers_id = [i.sub_id for i in Atable_subs.query.filter_by(cmaker_id=current_user.id)]
+            for f_id in followers_id:
+                rel_notif = Atable_notif(notif_id=notification.id, recip_id=f_id)
+                db.session.add(rel_notif)
             db.session.commit()
-        db.session.add(post)
-        notification = Notification(username=current_user.username, post_id=post.id, type='upload', content=" uploaded a new ")
-        db.session.add(notification)
-        followers_id = [i.sub_id for i in Atable_subs.query.filter_by(cmaker_id=current_user.id)]
-        for f_id in followers_id:
-            rel_notif = Atable_notif(notif_id=notification.id, recip_id=f_id)
-            db.session.add(rel_notif)
-        db.session.commit()
-        return redirect(url_for('main.home'))
+            return redirect(url_for('main.home'))
+    else:
+        loginform = LogInForm()
+        return render_template('login.html', title='Log In', searchform=searchform, loginform=loginform)
     return render_template('upload.html', title='Upload', uploadform=uploadform, info=info, searchform=searchform)
