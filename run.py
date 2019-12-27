@@ -1,4 +1,5 @@
 from package import create_app, db
+import create_db
 import os
 
 app = create_app()
