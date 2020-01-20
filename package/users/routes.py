@@ -191,7 +191,7 @@ def author(username):
     searchform = SearchForm()
     page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.order_by(Post.date_posted.desc())\
+    posts = Post.query.filter_by(user_id=user.id).order_by(Post.date_posted.desc())\
         .order_by(Post.date_posted.desc())\
         .paginate(per_page=24, page=page)
     return render_template('author_posts.html', posts=posts, user=user, searchform=searchform)
@@ -210,12 +210,11 @@ def favorites(username):
 def reset_request():
     searchform = SearchForm()
     if current_user.is_authenticated:
-        return redirect_url(url_for('main.home'))
+        return redirect(url_for('main.home'))
     requestform = RequestResetForm()
     if requestform.validate_on_submit():
         user = User.query.filter_by(email=requestform.email.data).first()
         send_reset_email(user)
-        flash('An email has been sent with instructions', 'info')
         return redirect(url_for('users.login'))
     return render_template('reset_request.html', title='Reset Password', requestform=requestform, searchform=searchform)
 
