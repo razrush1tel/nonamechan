@@ -191,7 +191,7 @@ def author(username):
     searchform = SearchForm()
     page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.order_by(Post.date_posted.desc())\
+    posts = Post.query.filter_by(user_id=user.id).order_by(Post.date_posted.desc())\
         .order_by(Post.date_posted.desc())\
         .paginate(per_page=24, page=page)
     return render_template('author_posts.html', posts=posts, user=user, searchform=searchform)
