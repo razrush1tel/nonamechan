@@ -130,7 +130,7 @@ def upload():
     searchform = SearchForm()
     if current_user.is_authenticated:
         if current_user.status == 'banned':
-            return render_template('banned.html')
+            return render_template('banned.html', searchform=searchform)
         info = "Max size is 4096KB."
         uploadform = UploadForm()
         if uploadform.validate_on_submit():
