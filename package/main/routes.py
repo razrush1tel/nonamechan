@@ -58,10 +58,6 @@ def search():
             select = list(sets[0])
             print(list(sets[0]))
             empty = False
-<<<<<<< HEAD
-    posts = Post.query.filter(Post.id.in_(select)).order_by(Post.date_posted.desc()).paginate(per_page=24, page=page)
-    return render_template('search.html', posts=posts, emptry=empty, searchform=searchform, filter=', '.join(tags))
-=======
     posts = Post.query.filter(Post.id.in_(sets)).order_by(Post.date_posted.desc()).paginate(per_page=24, page=page)
-    return render_template('search.html', posts=posts, emptry=empty, searchform=searchform, filter=', '.join(tags), tag_list=extract_tags(posts.items))
->>>>>>> bfdcfdb11c91f53e8fec313402b6ccda86114fa6
+    return render_template('search.html', posts=posts, empty=empty, searchform=searchform, filter=', '.join(tags), tag_list=extract_tags(posts.items))
+
