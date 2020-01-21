@@ -4,6 +4,20 @@ from package.posts.forms import SearchForm
 
 main = Blueprint('main', __name__)
 
+def extract_tags(posts):
+    tags = dict()
+    tag_list = list()
+    for post in posts:
+        tag_line = post.edit_tags.split(', ')
+        for tag in tag_line:
+            if tag not in tags:
+                tags[tag] = 1
+            else:
+                tags[tag] += 1
+    for tag in tags:
+        tag_list.append((tags[tag], tag))
+    tag_list.sort(reverse=True)
+    return tag_list
 
 @main.route('/')
 @main.route('/home', methods=['GET', 'POST'])
@@ -11,7 +25,7 @@ def home():
     searchform = SearchForm()
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(per_page=24, page=page)
-    return render_template('home.html', posts=posts, searchform=searchform)
+    return render_template('home.html', posts=posts, searchform=searchform, tag_list=extract_tags(posts.items))
 
 
 @main.route('/search', methods=['GET', 'POST'])
@@ -44,5 +58,10 @@ def search():
             select = list(sets[0])
             print(list(sets[0]))
             empty = False
+<<<<<<< HEAD
     posts = Post.query.filter(Post.id.in_(select)).order_by(Post.date_posted.desc()).paginate(per_page=24, page=page)
     return render_template('search.html', posts=posts, emptry=empty, searchform=searchform, filter=', '.join(tags))
+=======
+    posts = Post.query.filter(Post.id.in_(sets)).order_by(Post.date_posted.desc()).paginate(per_page=24, page=page)
+    return render_template('search.html', posts=posts, emptry=empty, searchform=searchform, filter=', '.join(tags), tag_list=extract_tags(posts.items))
+>>>>>>> bfdcfdb11c91f53e8fec313402b6ccda86114fa6
