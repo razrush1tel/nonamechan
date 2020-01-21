@@ -30,7 +30,6 @@ def home():
 
 @main.route('/search', methods=['GET', 'POST'])
 def search():
-    empty = True
     try:
         tags = request.form['query'].split(', ')
     except KeyError:
@@ -50,6 +49,5 @@ def search():
                 sets[0] = sets[0].intersection(sets[1])
                 sets.pop(1)
             sets = sets[0]
-            empty = False
     posts = Post.query.filter(Post.id.in_(sets)).order_by(Post.date_posted.desc()).paginate(per_page=24, page=page)
-    return render_template('search.html', posts=posts, emptry=empty, searchform=searchform, filter=', '.join(tags), tag_list=extract_tags(posts.items))
+    return render_template('search.html', posts=posts, searchform=searchform, filter=', '.join(tags), tag_list=extract_tags(posts.items))
