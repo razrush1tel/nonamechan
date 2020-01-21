@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="container">
+<div class="post-container">
   <h1>{{ posts.total }} <a href="{{ url_for('users.account', username=user.username) }}">{{ user.username }} Favorites</a></h1>
   {% for post in posts.items %}
   <a href="{{ url_for('posts.post', post_id=post.id) }}">
@@ -9,18 +9,24 @@
       </div>
   </a>
   {% endfor %}
-</div>
-<div class="container">
-{% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-  {% if page_num %}
-    {% if posts.page == page_num %}
-      <a href="{{ url_for('users.author', username=user.username, page=page_num) }}" style="font-weight: bold; text-decoration: underline;">{{ page_num }}</a>
+  <br>
+  {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+    {% if page_num %}
+      {% if posts.page == page_num %}
+        <a href="{{ url_for('users.author', username=user.username, page=page_num) }}" style="font-weight: bold; text-decoration: underline;">{{ page_num }}</a>
+      {% else %}
+        <a href="{{ url_for('users.author', username=user.username, page=page_num) }}">{{ page_num }}</a>
+      {% endif %}
     {% else %}
-      <a href="{{ url_for('users.author', username=user.username, page=page_num) }}">{{ page_num }}</a>
+      ...
     {% endif %}
-  {% else %}
-    ...
-  {% endif %}
-{% endfor %}
+  {% endfor %}
+</div>
+<div class="tag-container">
+    <ul style="list-style: none;">
+    {% for tag in tag_list %}
+        <li><a href="{{ url_for('main.search', tag=tag[1]) }}">{{ tag[1] }}</a></li>
+    {% endfor %}
+    </ul>
 </div>
 {% endblock content %}

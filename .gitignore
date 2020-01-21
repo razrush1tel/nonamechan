@@ -61,5 +61,11 @@ lib64
 pyvenv.cfg
 share/
 
-#heroku locals
-.env
+#deploy
+barnoul*
+
+#debug option
+run.py
+
+#will update manually
+zapiska.docx

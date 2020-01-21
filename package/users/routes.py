@@ -7,6 +7,7 @@ from package.users.forms import (LogInForm, RegistrationForm, SearchForm, Subscr
                         UpdateAccountForm, RequestResetForm, ResetPasswordForm)
 from package.posts.forms import CommentForm
 from package.users.utils import save_picture, send_reset_email
+from package.main.routes import extract_tags
 
 
 users = Blueprint('users', __name__)
@@ -194,7 +195,7 @@ def author(username):
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.date_posted.desc())\
         .order_by(Post.date_posted.desc())\
         .paginate(per_page=24, page=page)
-    return render_template('author_posts.html', posts=posts, user=user, searchform=searchform)
+    return render_template('author_posts.html', posts=posts, user=user, searchform=searchform, tag_list=extract_tags(posts.items))
 
 @users.route('/favorites/<string:username>', methods=['GET', 'POST'])
 def favorites(username):
@@ -203,7 +204,7 @@ def favorites(username):
     user = User.query.filter_by(username=username).first_or_404()
     favorite_set = set([i.fav_id for i in user.fav_list])
     posts = Post.query.filter(Post.id.in_(favorite_set)).order_by(Post.date_posted.desc()).paginate(per_page=24, page=page)
-    return render_template('favorites.html', posts=posts, user=user, searchform=searchform)
+    return render_template('favorites.html', posts=posts, user=user, searchform=searchform, tag_list=extract_tags(posts.items))
 
 
 @users.route('/reset_password', methods=['GET', 'POST'])

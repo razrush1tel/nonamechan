@@ -17,7 +17,7 @@
 .navigation {
   position: absolute;
   display: inline;
-  width: 200px;
+  width: 250px;
   left: 250px;
   top: 6px;
 }
@@ -90,6 +90,25 @@ a {
   box-sizing: border-box;
   margin: 10px;
   max-width: 100%;
+}
+
+.post-container {
+    vertical-align: top;
+    display: inline-block;
+    box-sizing: border-box;
+    margin: 10px;
+    max-width: 75%;
+}
+
+.tag-container {
+    display: inline-block;
+    margin: 10px;
+    min-width: 22%;
+    height: 900px;
+    float: right;
+    border-width: 1px;
+    border-color: black;
+    border-style: solid;
 }
 
 img {
