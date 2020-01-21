@@ -30,15 +30,13 @@ def home():
 
 @main.route('/search', methods=['GET', 'POST'])
 def search():
-    empty = True
     try:
         tags = request.form['query'].split(', ')
     except KeyError:
         tags = [request.args.get('tag', type=str)]
     searchform = SearchForm()
     page = request.args.get('page', 1, type=int)
-    sets = list()
-    select = list()
+    sets = []
     for tag in tags:
         post_ids = Tag.query.filter_by(name=tag).first()
         if post_ids is not None:
@@ -46,18 +44,10 @@ def search():
             id_set = set()
             for post_id in post_ids:
                 id_set.add(post_id.post_id)
-            print(id_set)
-            sets.append(set(id_set))
+            sets.append(id_set)
             while len(sets) > 1:
-                try:
-                    sets[0] = sets[0].intersection(sets[1])
-                    sets.pop(1)
-                except:
-                    break
-            sets = list(sets)
-            select = list(sets[0])
-            print(list(sets[0]))
-            empty = False
+                sets[0] = sets[0].intersection(sets[1])
+                sets.pop(1)
+            sets = sets[0]
     posts = Post.query.filter(Post.id.in_(sets)).order_by(Post.date_posted.desc()).paginate(per_page=24, page=page)
-    return render_template('search.html', posts=posts, empty=empty, searchform=searchform, filter=', '.join(tags), tag_list=extract_tags(posts.items))
-
+    return render_template('search.html', posts=posts, searchform=searchform, filter=', '.join(tags), tag_list=extract_tags(posts.items))
