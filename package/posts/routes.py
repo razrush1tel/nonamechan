@@ -37,7 +37,7 @@ def post_delete(post_id):
 @posts.route('/post/<int:post_id>/delete_confirm', methods=['POST'])
 def confirm_delete(post_id):
     post = Post.query.get_or_404(post_id)
-    if post.author == current_user or current_user.status == 'admin' or current_user.status == 'creator':
+    if post.author == current_user or current_user.role > 0:
         picture_path = os.path.join(current_app.root_path, f'static/post_images/{post.picture}')
         for i in post.tag_list:
             print(i)
