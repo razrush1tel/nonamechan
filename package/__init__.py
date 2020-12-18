@@ -6,6 +6,8 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from package.config import Config
 
+app = Flask(__name__)
+app.config.from_object(Config)
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
@@ -15,13 +17,11 @@ login_manager.login_message_category = "info"
 
 
 def create_app(config_class=Config):
-    app = Flask(__name__)
-    app.config.from_object(Config)
-
     bcrypt.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
     db.init_app(app)
+    migrate = Migrate(app, db)
 
     from package.users.routes import users
     from package.posts.routes import posts

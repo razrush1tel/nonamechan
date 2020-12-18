@@ -5,8 +5,10 @@ with open('/etc/config.json') as config_file:
     config = json.load(config_file)
 
     class Config:
+        CSRF_ENABLED = True
         SECRET_KEY = config.get('SECRET_KEY')
         SQLALCHEMY_DATABASE_URI = config.get('SQLALCHEMY_DATABASE_URI')
+        SQLALCHEMY_TRACK_MODIFICATIONS = False
         MAX_CONTENT_LENGTH = 4096 * 1024
         MAIL_SERVER = 'smtp.googlemail.com'
         MAIL_PORT = 587
