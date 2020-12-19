@@ -21,7 +21,6 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     mail.init_app(app)
     db.init_app(app)
-    migrate = Migrate(app, db)
 
     from package.users.routes import users
     from package.posts.routes import posts
