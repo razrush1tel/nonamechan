@@ -1,9 +1,9 @@
-import os, json
+import os
 from flask import Blueprint, render_template, url_for, flash, redirect, request, current_app
 from flask_login import login_user, current_user, logout_user, login_required
 from package import db, bcrypt
 from package.models import User, Post, Atable_subs, Atable_notif, Notification, Comment
-from package.users.forms import (LogInForm, RegistrationForm, SearchForm, SubscribeForm,
+from package.users.forms import (LogInForm, RegistrationForm, SearchForm,
                         UpdateAccountForm, RequestResetForm, ResetPasswordForm)
 from package.posts.forms import CommentForm
 from package.users.utils import save_picture, send_reset_email

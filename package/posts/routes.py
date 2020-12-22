@@ -39,13 +39,13 @@ def confirm_delete(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author == current_user or current_user.role > 0:
         picture_path = os.path.join(current_app.root_path, f'static/post_images/{post.picture}')
-        map(lambda x: db.session.delete(x), post.tag_list)
+        map(db.session.delete, Atable_tag.query.filter_by(post_id=post_id).all()) # tag is not deleted for some reason
         map(lambda x: db.session.delete(Atable_fav.query.filter_by(user_id=x.user_id, fav_id=post.id).first()),
             post.likers_list)
 
         del_notif = Notification.query.filter_by(post_id=post.id).first()
         if del_notif is not None:
-            map(lambda x: db.session.delete(x), Atable_notif.query.filter_by(notif_id=del_notif.id))
+            map(db.session.delete, Atable_notif.query.filter_by(notif_id=del_notif.id))
         db.session.delete(del_notif)
         db.session.delete(post)
         db.session.commit()
