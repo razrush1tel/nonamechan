@@ -39,16 +39,13 @@ def confirm_delete(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author == current_user or current_user.role > 0:
         picture_path = os.path.join(current_app.root_path, f'static/post_images/{post.picture}')
-        for i in post.tag_list:
-            print(i)
-            db.session.delete(i)
-        for i in post.likers_list:
-            rel_fav = Atable_fav.query.filter_by(user_id=i.user_id, fav_id=post.id).first()
-            db.session.delete(rel_fav)
+        map(lambda x: db.session.delete(x), post.tag_list)
+        map(lambda x: db.session.delete(Atable_fav.query.filter_by(user_id=x.user_id, fav_id=post.id).first()),
+            post.likers_list)
+
         del_notif = Notification.query.filter_by(post_id=post.id).first()
         if del_notif is not None:
-            for rel in Atable_notif.query.filter_by(notif_id=del_notif.id):
-                db.session.delete(rel)
+            map(lambda x: db.session.delete(x), Atable_notif.query.filter_by(notif_id=del_notif.id))
         db.session.delete(del_notif)
         db.session.delete(post)
         db.session.commit()
@@ -89,39 +86,28 @@ def post_edit(post_id):
     if uploadform.validate_on_submit():
         if uploadform.picture.data:
             picture_file, width, height = save_picture(uploadform.picture.data, 'no', 'post_images')
-            post.picture = picture_file
-            post.width = width
-            post.height = height
-        edit_tags_set = set(post.edit_tags.split(', '))
-        new_tags_set = set(uploadform.tags.data.split(', '))
+            post.picture = picture_file; post.width = width; post.height = height
+        edit_tags = post.edit_tags.split(', ')
+        new_tags = uploadform.tags.data.split(', ')
         post.edit_tags = uploadform.tags.data
-        db.session.commit()
-        delete_tags = list(edit_tags_set - new_tags_set)
-        for i in delete_tags:
+        for i in edit_tags:
             tag_to_del = Tag.query.filter_by(name=i).first()
             rel = Atable_tag.query.filter_by(tag_id=tag_to_del.id).first()
             if rel is not None:
                 db.session.delete(rel)
-                db.session.commit()
-        append_tags = list(new_tags_set - edit_tags_set)
-        for i in append_tags:
+
+        for i in new_tags:
             elem = Tag.query.filter_by(name=i).first()
             if not elem:
-                new_tag = Tag(name=i)
-                elem = new_tag
-                db.session.add(new_tag)
-                db.session.commit()
-            new_record = Atable_tag(post_id=post.id, tag_id=elem.id)
-            # check if no record exists otherwise it will result int NOT_UNIQUE error
-            if not Atable_tag.query.filter_by(post_id=post.id, tag_id=elem.id).first():
-                db.session.add(new_record)
-                db.session.commit()
+                db.session.add(Tag(name=i))
+                elem = Tag.query.filter_by(name=i).first() # need a smart fix
+            db.session.add(Atable_tag(post_id=post.id, tag_id=elem.id))
+        db.session.commit()
         return redirect(url_for('posts.post', post_id=post.id))
     elif request.method == 'GET':
         uploadform.picture.data = post.picture
         uploadform.tags.data = post.edit_tags
     return render_template('upload.html', title='Edit', post=post, uploadform=uploadform, info=info, searchform=searchform)
-
 
 
 @login_required
@@ -135,29 +121,22 @@ def upload():
         uploadform = UploadForm()
         if uploadform.validate_on_submit():
             picture_file, width, height = save_picture(uploadform.picture.data, 'no', 'post_images')
-            tags = uploadform.tags.data.split(', ')
-            print(tags)
             post = Post(picture=picture_file, picture_w=width, picture_h=height, author=current_user)
-            post.edit_tags = uploadform.tags.data
-            post.user_id = current_user.id
+            tags = uploadform.tags.data.split(', ')
+            post.edit_tags = uploadform.tags.data; post.user_id = current_user.id
+
             for i in tags:
                 elem = Tag.query.filter_by(name=i).first()
-                print(elem)
                 if not elem:
-                    new_tag = Tag(name=i)
-                    elem = new_tag
-                    db.session.add(new_tag)
-                    db.session.commit()
-                new_record = Atable_tag(post_id=post.id, tag_id=elem.id)
-                db.session.add(new_record)
-                db.session.commit()
+                    db.session.add(Tag(name=i))
+                    elem = Tag.query.filter_by(name=i).first()
+                db.session.add(Atable_tag(post_id=post.id, tag_id=elem.id))
             db.session.add(post)
+
             notification = Notification(username=current_user.username, post_id=post.id, type='upload', content=" uploaded a new ")
             db.session.add(notification)
             followers_id = [i.sub_id for i in Atable_subs.query.filter_by(cmaker_id=current_user.id)]
-            for f_id in followers_id:
-                rel_notif = Atable_notif(notif_id=notification.id, recip_id=f_id)
-                db.session.add(rel_notif)
+            map(lambda x: db.session.add(Atable_notif(notif_id=notification.id, recip_id=x)), followers_id)
             db.session.commit()
             return redirect(url_for('main.home'))
     else:
